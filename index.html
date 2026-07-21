@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVIN KEY - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #ff0040;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff0040, #ff4080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .header p {
+            color: #888;
+            margin-top: 10px;
+        }
+        
+        .card {
+            background: #15151f;
+            border: 1px solid #2a2a3a;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            color: #ff0040;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #0a0a0f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            border-color: #ff0040;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff0040, #ff4080);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 64, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #0a0a0f;
+            border-radius: 8px;
+            border: 1px solid #333;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            border-color: #00ff88;
+        }
+        
+        .result.error {
+            border-color: #ff0040;
+        }
+        
+        .result h3 {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .result.success h3 {
+            color: #00ff88;
+        }
+        
+        .result.error h3 {
+            color: #ff0040;
+        }
+        
+        .key-display {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3em;
+            color: #00ff88;
+            text-align: center;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            border: 1px solid #00ff88;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-row span:first-child {
+            color: #888;
+        }
+        
+        .info-row span:last-child {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .keys-list {
+            margin-top: 20px;
+        }
+        
+        .key-item {
+            background: #0a0a0f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .key-item .key-text {
+            font-family: 'Courier New', monospace;
+            color: #ff4080;
+            font-size: 1.1em;
+        }
+        
+        .key-item .key-info {
+            color: #888;
+            font-size: 0.85em;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .status-expired {
+            background: rgba(255, 0, 64, 0.2);
+            color: #ff0040;
+            border: 1px solid #ff0040;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #ff0040;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #15151f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: linear-gradient(45deg, #ff0040, #ff4080);
+            color: #fff;
+            border-color: transparent;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .key-item {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ ALVIN KEY</h1>
+            <p>Key Management System</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('generate')">Generate Key</div>
+            <div class="tab" onclick="switchTab('list')">List Keys</div>
+            <div class="tab" onclick="switchTab('validate')">Validate Key</div>
+        </div>
+        
+        <!-- GENERATE KEY TAB -->
+        <div id="generate" class="tab-content active">
+            <div class="card">
+                <h2>🔑 Generate New Key</h2>
+                
+                <div class="input-group">
+                    <label>Admin Secret</label>
+                    <input type="password" id="adminSecret" placeholder="Enter admin secret...">
+                </div>
+                
+                <div class="input-group">
+                    <label>Key Prefix</label>
+                    <input type="text" id="keyPrefix" value="ALVIN-VIP" placeholder="ALVIN-VIP">
+                </div>
+                
+                <div class="input-group">
+                    <label>Duration (Days)</label>
+                    <input type="number" id="keyDays" value="30" min="1" max="365">
+                </div>
+                
+                <div class="input-group">
+                    <label>Max Devices</label>
+                    <input type="number" id="maxDevices" value="1" min="1" max="10">
+                </div>
+                
+                <button class="btn" onclick="generateKey()">Generate Key</button>
+                
+                <div class="loading" id="genLoading">
+                    <div class="spinner"></div>
+                    <p>Generating...</p>
+                </div>
+                
+                <div class="result" id="genResult">
+                    <h3>✓ Key Generated!</h3>
+                    <div class="key-display" id="generatedKey"></div>
+                    <div class="info-row">
+                        <span>Expiry</span>
+                        <span id="genExpiry"></span>
+                    </div>
+                    <div class="info-row">
+                        <span>Max Devices</span>
+                        <span id="genMaxDev"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LIST KEYS TAB -->
+        <div id="list" class="tab-content">
+            <div class="card">
+                <h2>📋 All Keys</h2>
+                
+                <div class="input-group">
+                    <label>Admin Secret</label>
+                    <input type="password" id="listSecret" placeholder="Enter admin secret...">
+                </div>
+                
+                <button class="btn" onclick="listKeys()">Load Keys</button>
+                
+                <div class="loading" id="listLoading">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+                
+                <div class="keys-list" id="keysList"></div>
+            </div>
+        </div>
+        
+        <!-- VALIDATE KEY TAB -->
+        <div id="validate" class="tab-content">
+            <div class="card">
+                <h2>✅ Validate Key</h2>
+                
+                <div class="input-group">
+                    <label>Key</label>
+                    <input type="text" id="valKey" placeholder="ALVIN-VIP-XXXXXX">
+                </div>
+                
+                <div class="input-group">
+                    <label>Device ID</label>
+                    <input type="text" id="valDevice" placeholder="Enter device ID...">
+                </div>
+                
+                <button class="btn" onclick="validateKey()">Validate</button>
+                
+                <div class="loading" id="valLoading">
+                    <div class="spinner"></div>
+                    <p>Validating...</p>
+                </div>
+                
+                <div class="result" id="valResult">
+                    <h3 id="valStatus"></h3>
+                    <div class="info-row">
+                        <span>Key</span>
+                        <span id="valKeyDisplay"></span>
+                    </div>
+                    <div class="info-row">
+                        <span>Expiry</span>
+                        <span id="valExpiry"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = window.location.origin;
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        async function generateKey() {
+            const secret = document.getElementById('adminSecret').value;
+            const prefix = document.getElementById('keyPrefix').value;
+            const days = document.getElementById('keyDays').value;
+            const maxDev = document.getElementById('maxDevices').value;
+            
+            const loading = document.getElementById('genLoading');
+            const result = document.getElementById('genResult');
+            
+            loading.classList.add('show');
+            result.classList.remove('show', 'success', 'error');
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/generate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        secret: secret,
+                        prefix: prefix,
+                        days: parseInt(days),
+                        maxDevices: parseInt(maxDev)
+                    })
+                });
+                
+                const data = await res.json();
+                loading.classList.remove('show');
+                
+                if (res.ok) {
+                    result.classList.add('show', 'success');
+                    document.getElementById('generatedKey').textContent = data.key;
+                    document.getElementById('genExpiry').textContent = data.expiry;
+                    document.getElementById('genMaxDev').textContent = data.maxDevices;
+                } else {
+                    result.classList.add('show', 'error');
+                    result.querySelector('h3').textContent = '✗ ' + (data.error || 'Failed');
+                    document.getElementById('generatedKey').textContent = '';
+                }
+            } catch (err) {
+                loading.classList.remove('show');
+                result.classList.add('show', 'error');
+                result.querySelector('h3').textContent = '✗ Network Error';
+            }
+        }
+        
+        async function listKeys() {
+            const secret = document.getElementById('listSecret').value;
+            const loading = document.getElementById('listLoading');
+            const list = document.getElementById('keysList');
+            
+            loading.classList.add('show');
+            list.innerHTML = '';
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/keys?secret=${encodeURIComponent(secret)}`);
+                const data = await res.json();
+                loading.classList.remove('show');
+                
+                if (res.ok && data.keys) {
+                    data.keys.forEach(k => {
+                        const now = new Date();
+                        const expiry = new Date(k.expiry);
+                        const isActive = now <= expiry;
+                        
+                        list.innerHTML += `
+                            <div class="key-item">
+                                <div>
+                                    <div class="key-text">${k.key}</div>
+                                    <div class="key-info">Expiry: ${k.expiry} | Devices: ${ ${k.devices}</div>
+                                </div>
+                                <span class="status-badge ${isActive ? 'status-active' : 'status-expired'}">
+                                    ${isActive ? 'ACTIVE' : 'EXPIRED'}
+                                </span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = `<div class="result error show"><h3>✗ ${data.error || 'Failed'}</h3></div>`;
+                }
+            } catch (err) {
+                loading.classList.remove('show');
+                list.innerHTML = `<div class="result error show"><h3>✗ Network Error</h3></div>`;
+            }
+        }
+        
+        async function validateKey() {
+            const key = document.getElementById('valKey').value;
+            const device = document.getElementById('valDevice').value;
+            const loading = document.getElementById('valLoading');
+            const result = document.getElementById('valResult');
+            
+            loading.classList.add('show');
+            result.classList.remove('show', 'success', 'error');
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/validate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        key: key,
+                        device_id: device
+                    })
+                });
+                
+                const data = await res.json();
+                loading.classList.remove('show');
+                
+                if (data.valid) {
+                    result.classList.add('show', 'success');
+                    document.getElementById('valStatus').textContent = '✓ VALID KEY';
+                    document.getElementById('valKeyDisplay').textContent = data.key;
+                    document.getElementById('valExpiry').textContent = data.expiry;
+                } else {
+                    result.classList.add('show', 'error');
+                    document.getElementById('valStatus').textContent = '✗ ' + (data.error || 'Invalid');
+                    document.getElementById('valKeyDisplay').textContent = key;
+                    document.getElementById('valExpiry').textContent = '-';
+                }
+            } catch (err) {
+                loading.classList.remove('show');
+                result.classList.add('show', 'error');
+                document.getElementById('valStatus').textContent = '✗ Network Error';
+            }
+        }
+    </script>
+</body>
+</html>
